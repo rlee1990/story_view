@@ -482,7 +482,7 @@ class StoryViewState extends State<StoryView> with TickerProviderStateMixin {
   void dispose() {
     _clearDebouncer();
 
-    _animationController?.dispose();
+    // _animationController?.dispose();
     _playbackSubscription?.cancel();
 
     super.dispose();
