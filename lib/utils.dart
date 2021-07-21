@@ -5,7 +5,7 @@ enum Direction { up, down, left, right }
 class VerticalDragInfo {
   bool cancel = false;
 
-  late Direction? direction;
+  Direction? direction;
 
   void update(double primaryDelta) {
     Direction tmpDirection;
