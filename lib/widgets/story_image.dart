@@ -11,11 +11,11 @@ import '../controller/story_controller.dart';
 /// Utitlity to load image (gif, png, jpg, etc) media just once. Resource is
 /// cached to disk with default configurations of [DefaultCacheManager].
 class ImageLoader {
-  ui.Codec frames;
+  ui.Codec? frames;
 
   String url;
 
-  Map<String, dynamic> requestHeaders;
+  Map<String, String>? requestHeaders;
 
   LoadState state = LoadState.loading; // by default
 
@@ -46,7 +46,7 @@ class ImageLoader {
 
         this.state = LoadState.success;
 
-        PaintingBinding.instance.instantiateImageCodec(imageBytes).then(
+        PaintingBinding.instance?.instantiateImageCodec(imageBytes).then(
             (codec) {
           this.frames = codec;
           onComplete();
@@ -75,18 +75,18 @@ class StoryImage extends StatefulWidget {
 
   StoryImage(
     this.imageLoader, {
-    Key key,
-    this.controller,
-    this.fit,
+    Key? key,
+    required this.controller,
+    required this.fit,
   }) : super(key: key ?? UniqueKey());
 
   /// Use this shorthand to fetch images/gifs from the provided [url]
   factory StoryImage.url(
     String url, {
-    StoryController controller,
-    Map<String, dynamic> requestHeaders,
+    required StoryController controller,
+    Map<String, String>? requestHeaders,
     BoxFit fit = BoxFit.fitWidth,
-    Key key,
+    Key? key,
   }) {
     return StoryImage(
         ImageLoader(
@@ -103,11 +103,11 @@ class StoryImage extends StatefulWidget {
 }
 
 class StoryImageState extends State<StoryImage> {
-  ui.Image currentFrame;
+  ui.Image? currentFrame;
 
-  Timer _timer;
+  Timer? _timer;
 
-  StreamSubscription<PlaybackState> _streamSubscription;
+  StreamSubscription<PlaybackState>? _streamSubscription;
 
   @override
   void initState() {
@@ -129,12 +129,12 @@ class StoryImageState extends State<StoryImage> {
       });
     }
 
-    widget.controller?.pause();
+    widget.controller.pause();
 
     widget.imageLoader.loadImage(() async {
       if (mounted) {
         if (widget.imageLoader.state == LoadState.success) {
-          widget.controller?.play();
+          widget.controller.play();
           forward();
         } else {
           // refresh to show error
@@ -167,7 +167,7 @@ class StoryImageState extends State<StoryImage> {
       return;
     }
 
-    final nextFrame = await widget.imageLoader.frames.getNextFrame();
+    final nextFrame = await widget.imageLoader.frames!.getNextFrame();
 
     this.currentFrame = nextFrame.image;
 

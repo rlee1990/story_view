@@ -11,9 +11,9 @@ import '../controller/story_controller.dart';
 class VideoLoader {
   String url;
 
-  File videoFile;
+  File? videoFile;
 
-  Map<String, dynamic> requestHeaders;
+  Map<String, String>? requestHeaders;
 
   LoadState state = LoadState.loading;
 
@@ -44,13 +44,13 @@ class StoryVideo extends StatefulWidget {
   final StoryController storyController;
   final VideoLoader videoLoader;
 
-  StoryVideo(this.videoLoader, {this.storyController, Key key})
+  StoryVideo(this.videoLoader, {required this.storyController, Key? key})
       : super(key: key ?? UniqueKey());
 
   static StoryVideo url(String url,
-      {StoryController controller,
-      Map<String, dynamic> requestHeaders,
-      Key key}) {
+      {required StoryController controller,
+      Map<String, String>? requestHeaders,
+      Key? key}) {
     return StoryVideo(
       VideoLoader(url, requestHeaders: requestHeaders),
       storyController: controller,
@@ -65,11 +65,11 @@ class StoryVideo extends StatefulWidget {
 }
 
 class StoryVideoState extends State<StoryVideo> {
-  Future<void> playerLoader;
+  Future<void>? playerLoader;
 
-  StreamSubscription _streamSubscription;
+  StreamSubscription? _streamSubscription;
 
-  VideoPlayerController playerController;
+  VideoPlayerController? playerController;
 
   @override
   void initState() {
@@ -80,9 +80,9 @@ class StoryVideoState extends State<StoryVideo> {
     widget.videoLoader.loadVideo(() {
       if (widget.videoLoader.state == LoadState.success) {
         this.playerController =
-            VideoPlayerController.file(widget.videoLoader.videoFile);
+            VideoPlayerController.file(widget.videoLoader.videoFile!);
 
-        playerController.initialize().then((v) {
+        playerController?.initialize().then((v) {
           setState(() {});
           widget.storyController.play();
         });
@@ -91,9 +91,9 @@ class StoryVideoState extends State<StoryVideo> {
           _streamSubscription =
               widget.storyController.playbackNotifier.listen((playbackState) {
             if (playbackState == PlaybackState.pause) {
-              playerController.pause();
+              playerController?.pause();
             } else {
-              playerController.play();
+              playerController?.play();
             }
           });
         }
@@ -105,11 +105,11 @@ class StoryVideoState extends State<StoryVideo> {
 
   Widget getContentView() {
     if (widget.videoLoader.state == LoadState.success &&
-        playerController.value.initialized) {
+        playerController!.value.isInitialized) {
       return Center(
         child: AspectRatio(
-          aspectRatio: playerController.value.aspectRatio,
-          child: VideoPlayer(playerController),
+          aspectRatio: playerController!.value.aspectRatio,
+          child: VideoPlayer(playerController!),
         ),
       );
     }
@@ -146,7 +146,7 @@ class StoryVideoState extends State<StoryVideo> {
 
   @override
   void dispose() {
-    playerController.dispose();
+    playerController?.dispose();
     _streamSubscription?.cancel();
     super.dispose();
   }
