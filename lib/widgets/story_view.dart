@@ -510,6 +510,7 @@ class StoryViewState extends State<StoryView>
     _animationController?.duration = storyItem.duration;
     _animationController?.addStatusListener((status) {
       if (status == AnimationStatus.completed) {
+        _animationController?.reset();
         storyItem.shown = true;
         if (widget.storyItems.last != storyItem) {
           _beginPlay();
@@ -532,7 +533,6 @@ class StoryViewState extends State<StoryView>
   }
 
   void _onComplete() {
-    _animationController?.reset();
     if (widget.onComplete != null) {
       widget.controller.pause();
       widget.onComplete();
@@ -548,7 +548,7 @@ class StoryViewState extends State<StoryView>
   }
 
   void _goBack() {
-    _animationController?.stop();
+    _animationController?.reset();
 
     if (this._currentStory == null) {
       widget.storyItems.last.shown = false;
@@ -569,7 +569,7 @@ class StoryViewState extends State<StoryView>
 
   void _goForward() {
     if (this._currentStory != widget.storyItems.last) {
-      _animationController?.stop();
+      _animationController?.reset();
 
       // get last showing
       final _last = this._currentStory;
@@ -625,7 +625,7 @@ class StoryViewState extends State<StoryView>
                   widget.storyItems
                       .map((it) => PageData(it.duration, it.shown))
                       .toList(),
-                  this._currentAnimation!,
+                  _currentAnimation!,
                   key: UniqueKey(),
                   indicatorHeight: widget.inline
                       ? IndicatorHeight.small
@@ -771,7 +771,7 @@ class PageBarState extends State<PageBar> {
                 right: widget.pages.last == it ? 0 : this.spacing),
             child: StoryProgressIndicator(
               isPlaying(it)
-                  ? widget.animation.value
+                  ? it.duration.inSeconds.toDouble()
                   : it.shown
                       ? 1
                       : 0,
