@@ -410,7 +410,8 @@ class StoryView extends StatefulWidget {
   }
 }
 
-class StoryViewState extends State<StoryView> with TickerProviderStateMixin {
+class StoryViewState extends State<StoryView>
+    with SingleTickerProviderStateMixin {
   AnimationController? _animationController;
   Animation<double>? _currentAnimation;
   Timer? _nextDebouncer;
@@ -428,6 +429,7 @@ class StoryViewState extends State<StoryView> with TickerProviderStateMixin {
 
   @override
   void initState() {
+    _animationController = AnimationController(vsync: this);
     super.initState();
 
     // All pages after the first unshown page should have their shown value as
@@ -455,12 +457,12 @@ class StoryViewState extends State<StoryView> with TickerProviderStateMixin {
       switch (playbackStatus) {
         case PlaybackState.play:
           _removeNextHold();
-          this._animationController?.forward();
+          _animationController?.forward();
           break;
 
         case PlaybackState.pause:
           _holdNext(); // then pause animation
-          this._animationController?.stop(canceled: false);
+          _animationController?.stop();
           break;
 
         case PlaybackState.next:
@@ -482,7 +484,7 @@ class StoryViewState extends State<StoryView> with TickerProviderStateMixin {
   void dispose() {
     _clearDebouncer();
 
-    // _animationController?.dispose();
+    _animationController?.dispose();
     _playbackSubscription?.cancel();
 
     super.dispose();
@@ -496,7 +498,6 @@ class StoryViewState extends State<StoryView> with TickerProviderStateMixin {
   }
 
   void _play() {
-    _animationController?.dispose();
     // get the next playing page
     final storyItem = widget.storyItems.firstWhere((it) {
       return !it.shown;
@@ -506,8 +507,7 @@ class StoryViewState extends State<StoryView> with TickerProviderStateMixin {
       widget.onStoryShow(storyItem);
     }
 
-    _animationController =
-        AnimationController(duration: storyItem.duration, vsync: this);
+    _animationController?.duration = storyItem.duration;
     _animationController?.addStatusListener((status) {
       if (status == AnimationStatus.completed) {
         storyItem.shown = true;
@@ -532,6 +532,7 @@ class StoryViewState extends State<StoryView> with TickerProviderStateMixin {
   }
 
   void _onComplete() {
+    _animationController?.reset();
     if (widget.onComplete != null) {
       widget.controller.pause();
       widget.onComplete();
@@ -581,8 +582,8 @@ class StoryViewState extends State<StoryView> with TickerProviderStateMixin {
       }
     } else {
       // this is the last page, progress animation should skip to end
-      _animationController?.animateTo(1.0,
-          duration: Duration(milliseconds: 10));
+      // _animationController?.animateTo(1.0,
+      //     duration: Duration(milliseconds: 10));
     }
   }
 
