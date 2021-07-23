@@ -521,10 +521,9 @@ class StoryViewState extends State<StoryView>
       }
     });
 
+    widget.controller.play();
     _currentAnimation =
         Tween(begin: 0.0, end: 1.0).animate(_animationController!);
-
-    widget.controller.play();
   }
 
   void _beginPlay() {
@@ -550,15 +549,15 @@ class StoryViewState extends State<StoryView>
   void _goBack() {
     _animationController?.reset();
 
-    if (this._currentStory == null) {
+    if (_currentStory == null) {
       widget.storyItems.last.shown = false;
     }
 
-    if (this._currentStory == widget.storyItems.first) {
+    if (_currentStory == widget.storyItems.first) {
       _beginPlay();
     } else {
-      this._currentStory?.shown = false;
-      int lastPos = widget.storyItems.indexOf(this._currentStory!);
+      _currentStory?.shown = false;
+      int lastPos = widget.storyItems.indexOf(_currentStory!);
       final previous = widget.storyItems[lastPos - 1];
 
       previous.shown = false;
@@ -568,11 +567,11 @@ class StoryViewState extends State<StoryView>
   }
 
   void _goForward() {
-    if (this._currentStory != widget.storyItems.last) {
+    if (_currentStory != widget.storyItems.last) {
       _animationController?.reset();
 
       // get last showing
-      final _last = this._currentStory;
+      final _last = _currentStory;
 
       if (_last != null) {
         _last.shown = true;
@@ -771,7 +770,7 @@ class PageBarState extends State<PageBar> {
                 right: widget.pages.last == it ? 0 : this.spacing),
             child: StoryProgressIndicator(
               isPlaying(it)
-                  ? it.duration.inSeconds.toDouble()
+                  ? widget.animation.value
                   : it.shown
                       ? 1
                       : 0,

@@ -126,11 +126,9 @@ class StoryVideoState extends State<StoryVideo> {
             ),
           )
         : Center(
-            child: Text(
-            "Media failed to load.",
-            style: TextStyle(
-              color: Colors.white,
-            ),
+            child: CircularProgressIndicator(
+            valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+            strokeWidth: 3,
           ));
   }
 
