@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'dart:ui' as ui;
+import 'dart:ui';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/painting.dart';
@@ -42,11 +43,13 @@ class ImageLoader {
           return;
         }
 
-        final imageBytes = (fileResponse as FileInfo).file.readAsBytesSync();
+        final imageBytes = (fileResponse).file.readAsBytesSync();
+        ImmutableBuffer buffer =
+            ImmutableBuffer.fromUint8List(imageBytes) as ui.ImmutableBuffer;
 
         this.state = LoadState.success;
 
-        PaintingBinding.instance?.instantiateImageCodec(imageBytes).then(
+        PaintingBinding.instance.instantiateImageCodecWithSize(buffer).then(
             (codec) {
           this.frames = codec;
           onComplete();
