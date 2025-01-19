@@ -80,23 +80,21 @@ class StoryVideoState extends State<StoryVideo> {
     widget.videoLoader.loadVideo(() {
       if (widget.videoLoader.state == LoadState.success) {
         this.playerController =
-            VideoPlayerController.network(widget.videoLoader.url);
+            VideoPlayerController.networkUrl(Uri.parse(widget.videoLoader.url));
 
         playerController?.initialize().then((v) {
           setState(() {});
           widget.storyController.play();
         });
 
-        if (widget.storyController != null) {
-          _streamSubscription =
-              widget.storyController.playbackNotifier.listen((playbackState) {
-            if (playbackState == PlaybackState.pause) {
-              playerController?.pause();
-            } else {
-              playerController?.play();
-            }
-          });
-        }
+        _streamSubscription =
+            widget.storyController.playbackNotifier.listen((playbackState) {
+          if (playbackState == PlaybackState.pause) {
+            playerController?.pause();
+          } else {
+            playerController?.play();
+          }
+        });
       } else {
         setState(() {});
       }

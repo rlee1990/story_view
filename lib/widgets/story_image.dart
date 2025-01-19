@@ -1,9 +1,7 @@
 import 'dart:async';
 import 'dart:ui' as ui;
-import 'dart:ui';
 
 import 'package:flutter/material.dart';
-import 'package:flutter/painting.dart';
 import 'package:flutter_cache_manager/flutter_cache_manager.dart';
 
 import '../utils.dart';
@@ -44,13 +42,10 @@ class ImageLoader {
         }
 
         final imageBytes = (fileResponse).file.readAsBytesSync();
-        ImmutableBuffer buffer =
-            ImmutableBuffer.fromUint8List(imageBytes) as ui.ImmutableBuffer;
 
         this.state = LoadState.success;
 
-        PaintingBinding.instance.instantiateImageCodecWithSize(buffer).then(
-            (codec) {
+        ui.instantiateImageCodec(imageBytes).then((codec) {
           this.frames = codec;
           onComplete();
         }, onError: (error) {
@@ -116,21 +111,19 @@ class StoryImageState extends State<StoryImage> {
   void initState() {
     super.initState();
 
-    if (widget.controller != null) {
-      this._streamSubscription =
-          widget.controller.playbackNotifier.listen((playbackState) {
-        // for the case of gifs we need to pause/play
-        if (widget.imageLoader.frames == null) {
-          return;
-        }
+    this._streamSubscription =
+        widget.controller.playbackNotifier.listen((playbackState) {
+      // for the case of gifs we need to pause/play
+      if (widget.imageLoader.frames == null) {
+        return;
+      }
 
-        if (playbackState == PlaybackState.pause) {
-          this._timer?.cancel();
-        } else {
-          forward();
-        }
-      });
-    }
+      if (playbackState == PlaybackState.pause) {
+        this._timer?.cancel();
+      } else {
+        forward();
+      }
+    });
 
     widget.controller.pause();
 
@@ -165,8 +158,7 @@ class StoryImageState extends State<StoryImage> {
   void forward() async {
     this._timer?.cancel();
 
-    if (widget.controller != null &&
-        widget.controller.playbackNotifier.value == PlaybackState.pause) {
+    if (widget.controller.playbackNotifier.value == PlaybackState.pause) {
       return;
     }
 
